@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Moq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,28 +11,61 @@ namespace UnitTestin.Test
 {
     public class CalculatorTest
     {
-        [Fact]
-        public void AddTest()
+        public Calculator? Calculator { get; set; }
+        public Mock<ICalculatorService> myMock { get; set; }
+        public CalculatorTest()
         {
-            /*//Arrange --- In arrange, variables that will take part in methods params must be initialized
-            int a = 5; 
-            int b =20;
-            var calculator = new Calculator();
-
-            //Act --- In act section methods of class that must be tested will be executed
-            var total = calculator.Add(a, b);
+            myMock= new Mock<ICalculatorService>();
+            this.Calculator= new Calculator(myMock.Object);
 
 
-            //Assert --- Matching test results to our expectations
-            Assert.Equal<int>(25, total);*/
+            //without mocking. This is not suggested because it takes time to complete as normal
+            //mocking is far faster than usual way
+            //this.Calculator = new Calculator(new CalculatorService());
+        }
+        [Theory]
+        [InlineData(2,5,7)]
+        [InlineData(3,10,13)]
+        public void Add_simpleValues_ReturnTotalValue(int a, int b, int expectedTotal) 
+        {
 
-            /*var names = new List<string>() {"John", "Doe","Noone" };
+            myMock.Setup(x=>x.Add(a, b)).Returns(expectedTotal);
+            Assert.Equal(expectedTotal, Calculator.Add(a, b));
 
-            Assert.Contains(names, x => x == "Doe");*/
+            myMock.Verify(x=>x.Add(a,b), Times.AtLeast(1));
 
-            /*var regEx = "^dog";
-            Assert.Matches(regEx, "dog");*/
+            //P.S. both assert and verify can be used multiple times in test method
+        }
+
+        [Theory]
+        [InlineData(0,5,0)]
+        [InlineData(3,0,0)]
+        public void Add_zeroValues_ReturnZeroValue(int a, int b, int expectedTotal) 
+        {
+            //creates the copy of the base method and uses the copy for test, the real service remains untouched
+            myMock.Setup(x => x.Add(a, b)).Returns(expectedTotal);
+            Assert.Equal(expectedTotal, Calculator.Add(a,b));
+        }
+        [Theory]
+        [InlineData(3,5,15)]
+        [InlineData(3, 2,6)]
+        public void Multip_simpleValues_ReturnMultipValue(int a, int b, int expectedTotal)
+        {
+            //creates the copy of the base method and uses the copy for test, the real service remains untouched
+            myMock.Setup(x => x.Multip(a, b)).Returns(expectedTotal);
             
+            Assert.Equal(expectedTotal, Calculator.Multip(a,b));
+        }
+
+
+        [Theory]
+        [InlineData(3, 5)]
+        [InlineData(3, 2)]
+        public void Multip_zeroValues_ReturnException(int a, int b)
+        {
+            myMock.Setup(x => x.Multip(a,b)).Throws(new Exception("a can not be zero"));
+            Exception exception= Assert.Throws<Exception>(()=> Calculator.Multip(a, b));
+            Assert.Equal("a can not be zero", exception.Message);
         }
     }
 }
