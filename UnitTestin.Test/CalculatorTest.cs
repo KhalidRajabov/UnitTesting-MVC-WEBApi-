@@ -56,8 +56,8 @@ namespace UnitTestin.Test
             
             Assert.Equal(expectedTotal, Calculator.Multip(a,b));
         }
-
-
+         
+         
         [Theory]
         [InlineData(3, 5)]
         [InlineData(3, 2)]
