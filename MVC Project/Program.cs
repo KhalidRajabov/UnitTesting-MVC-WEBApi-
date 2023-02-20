@@ -4,10 +4,13 @@ Scaffold - DbContext "connectionString" Microsoft.EntityFrameworkCore.SqlServer 
 
 using Microsoft.EntityFrameworkCore;
 using MVC_Project.Models;
+using MVC_Project.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
+
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddDbContext<UnitTestingDbContext>(opt =>
 {
     opt.UseSqlServer(builder.Configuration["SqlConstr"]);

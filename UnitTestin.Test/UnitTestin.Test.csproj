@@ -32,6 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MVC Project\MVC Project.csproj" />
     <ProjectReference Include="..\UnitTesting.App\UnitTesting.App.csproj" />
   </ItemGroup>
 
